@@ -26,6 +26,26 @@ func (r *Client) CreateUser(user User) (StatusMessage, error) {
 	return resp, nil
 }
 
+func (r *Client) CreateUserPermission(uid uint, isAdmin bool) (StatusMessage, error) {
+	var (
+		raw  []byte
+		resp StatusMessage
+		err  error
+	)
+	var data Permission
+	data.IsGrafanaAdmin = isAdmin
+	if raw, err = json.Marshal(data); err != nil {
+		return StatusMessage{}, err
+	}
+	if raw, _, err = r.put(fmt.Sprintf("api/admin/users/%d/permissions", uid), nil, raw); err != nil {
+		return StatusMessage{}, err
+	}
+	if err = json.Unmarshal(raw, &resp); err != nil {
+		return StatusMessage{}, err
+	}
+	return resp, nil
+}
+
 func (r *Client) SwitchUserContext(uid uint, oid uint) (StatusMessage, error) {
 	var (
 		raw  []byte
