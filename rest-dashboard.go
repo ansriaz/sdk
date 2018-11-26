@@ -198,7 +198,7 @@ func (r *Client) SetDashboard(board Board, overwrite bool) error {
 // Contrary to SetDashboard() it accepts raw JSON instead of Board structure.
 // Grafana only can create or update a dashboard in a database. File dashboards
 // may be only loaded with HTTP API but not created or updated.
-func (r *Client) SetRawDashboard(raw []byte) error {
+func (r *Client) SetRawDashboard(raw []byte, oid uint) error {
 	var (
 		rawResp []byte
 		resp    StatusMessage
@@ -216,7 +216,7 @@ func (r *Client) SetRawDashboard(raw []byte) error {
 	buf.WriteString(`{"dashboard":`)
 	buf.Write(raw)
 	buf.WriteString(`, "overwrite": true}`)
-	if rawResp, code, err = r.post("api/dashboards/db", nil, buf.Bytes()); err != nil {
+	if rawResp, code, err = r.post("api/dashboards/db", nil, buf.Bytes(), oid); err != nil {
 		return err
 	}
 	if err = json.Unmarshal(rawResp, &resp); err != nil {

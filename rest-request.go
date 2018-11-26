@@ -67,27 +67,57 @@ func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) *Client {
 	return &Client{baseURL: baseURL.String(), basicAuth: basicAuth, key: key, client: client}
 }
 
-func (r *Client) get(query string, params url.Values) ([]byte, int, error) {
-	return r.doRequest("GET", query, params, nil)
+func (r *Client) get(query string, params url.Values, oid ...uint) ([]byte, int, error) {
+	var orgID uint
+	if len(oid) > 0 {
+		orgID = oid[0]
+	} else {
+		orgID = 0
+	}
+	return r.doRequest("GET", query, params, nil, orgID)
 }
 
-func (r *Client) patch(query string, params url.Values, body []byte) ([]byte, int, error) {
-	return r.doRequest("PATCH", query, params, bytes.NewBuffer(body))
+func (r *Client) patch(query string, params url.Values, body []byte, oid ...uint) ([]byte, int, error) {
+	var orgID uint
+	if len(oid) > 0 {
+		orgID = oid[0]
+	} else {
+		orgID = 0
+	}
+	return r.doRequest("PATCH", query, params, bytes.NewBuffer(body), orgID)
 }
 
-func (r *Client) put(query string, params url.Values, body []byte) ([]byte, int, error) {
-	return r.doRequest("PUT", query, params, bytes.NewBuffer(body))
+func (r *Client) put(query string, params url.Values, body []byte, oid ...uint) ([]byte, int, error) {
+	var orgID uint
+	if len(oid) > 0 {
+		orgID = oid[0]
+	} else {
+		orgID = 0
+	}
+	return r.doRequest("PUT", query, params, bytes.NewBuffer(body), orgID)
 }
 
-func (r *Client) post(query string, params url.Values, body []byte) ([]byte, int, error) {
-	return r.doRequest("POST", query, params, bytes.NewBuffer(body))
+func (r *Client) post(query string, params url.Values, body []byte, oid ...uint) ([]byte, int, error) {
+	var orgID uint
+	if len(oid) > 0 {
+		orgID = oid[0]
+	} else {
+		orgID = 0
+	}
+	return r.doRequest("POST", query, params, bytes.NewBuffer(body), orgID)
 }
 
-func (r *Client) delete(query string) ([]byte, int, error) {
-	return r.doRequest("DELETE", query, nil, nil)
+func (r *Client) delete(query string, oid ...uint) ([]byte, int, error) {
+	var orgID uint
+	if len(oid) > 0 {
+		orgID = oid[0]
+	} else {
+		orgID = 0
+	}
+	return r.doRequest("DELETE", query, nil, nil, orgID)
 }
 
-func (r *Client) doRequest(method, query string, params url.Values, buf io.Reader) ([]byte, int, error) {
+func (r *Client) doRequest(method, query string, params url.Values, buf io.Reader, oid ...uint) ([]byte, int, error) {
 	u, _ := url.Parse(r.baseURL)
 	u.Path = path.Join(u.Path, query)
 	if params != nil {
@@ -100,6 +130,12 @@ func (r *Client) doRequest(method, query string, params url.Values, buf io.Reade
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", "autograf")
+	var orgID uint
+	if len(oid) > 0 {
+		orgID = oid[0]
+		req.Header.Set("X-Grafana-Org-Id", fmt.Sprint(orgID))
+	}
+
 	resp, err := r.client.Do(req)
 	if err != nil {
 		return nil, 0, err
