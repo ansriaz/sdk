@@ -83,7 +83,7 @@ You need Grafana API key with _admin rights_ for using these utilities.
 
 Of course Go development environment should be set up first. Then:
 
-    go get github.com/grafana-tools/sdk
+    go get github.com/ansriaz/sdk
 
 Dependency packages have included into
 distro. [govendor](https://github.com/kardianos/govendor) utility used
