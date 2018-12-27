@@ -215,7 +215,7 @@ func (r *Client) SetRawDashboard(raw []byte, oid uint) error {
 	raw, _ = json.Marshal(plain)
 	buf.WriteString(`{"dashboard":`)
 	buf.Write(raw)
-	buf.WriteString(`, "overwrite": true}`)
+	buf.WriteString(`, "overwrite": false}`)
 	if rawResp, code, err = r.post("api/dashboards/db", nil, buf.Bytes(), oid); err != nil {
 		return err
 	}
